@@ -9,5 +9,5 @@ var printJalaliDate = function(givenDateTime){
     console.log(jalaliDate);
 }
 
-// call printJalaliDate function with now DateTime to calculate Today date in "Jalali" date format
+// call printJalaliDate function with now DateTime to calculate today date in "Jalali" date format
 printJalaliDate(new Date())
