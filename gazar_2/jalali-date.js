@@ -1,12 +1,13 @@
-// printTodayDate function calculates now date-time and converts it to "jalali" date format
-var printTodayDate = function(){
+// printJalaliDate function get a DateTime and converts it to "jalali" date format
+var printJalaliDate = function(givenDateTime){
     var DateOptions = { year: 'numeric',
                         month: 'long',
                         weekday: 'long',
                         day: 'numeric'
                     }
-    var TodayDate = new Intl.DateTimeFormat('fa-IR', DateOptions).format(new Date());
-    console.log(TodayDate);
+    var jalaliDate = new Intl.DateTimeFormat('fa-IR', DateOptions).format(givenDateTime);
+    console.log(jalaliDate);
 }
 
-printTodayDate()
+// call printJalaliDate function with now DateTime to calculate Today date in "Jalali" date format
+printJalaliDate(new Date())
