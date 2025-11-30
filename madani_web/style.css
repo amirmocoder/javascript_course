@@ -173,6 +173,7 @@ button, .btn{
 
 .product-image {
     width: 100%;
+    max-width: 320px;
     display: block;
     background-color: #f9fafb;
 }

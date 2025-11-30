@@ -473,7 +473,7 @@ function renderCart() {
         var lineTotalEl = document.createElement("span");
         lineTotalEl.className = "cart-line-total";
         lineTotalEl.innerHTML =
-            "مجموع: " + formatNumber(lineTotal) + " ریال";
+            "مجموع: " + formatNumber(lineTotal) + " تومان";
 
         side.appendChild(qtyEl);
         side.appendChild(lineTotalEl);
@@ -682,18 +682,18 @@ function createProductCard(product) {
     // اگر تخفیف وجود دارد
     if (discountEnabled && product.discountPrice) {
         original.className = "price-old";
-        original.innerHTML = "ریال " + formatNumber(basePrice);
+        original.innerHTML = "تومان " + formatNumber(basePrice);
 
         current.className = "price-current";
         current.style.display = "block";
-        current.innerHTML = "ریال " + formatNumber(product.discountPrice);
+        current.innerHTML = "تومان " + formatNumber(product.discountPrice);
 
         discount.className = "price-discount";
         discount.style.display = "block";
         discount.innerHTML = "تخفیف " + product.discountPercent + "٪";
     } else {
         original.className = "price-original";
-        original.innerHTML = "ریال " + formatNumber(basePrice);
+        original.innerHTML = "تومان " + formatNumber(basePrice);
 
         current.className = "price-current";
         current.style.display = "none";
