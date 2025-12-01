@@ -10,7 +10,6 @@ body {
     color: #374151;
 }
 
-/* هدر: فقط لوگو و عنوان، با نوار ساده سبز */
 header {
     display: flex;
     align-items: center;
@@ -48,7 +47,6 @@ button, .btn{
     color: #111827;
 }
 
-/* نوار تخفیف زیر هدر (وقتی تخفیف فعال شد) */
 .discount-bar {
     max-width: 1150px;
     margin: 8px auto 0;
@@ -63,7 +61,6 @@ button, .btn{
     justify-content: center;
 }
 
-/* کادر کلی محصولات */
 .products-wrapper {
     max-width: 1150px;
     margin: 12px auto 40px;
@@ -74,7 +71,6 @@ button, .btn{
     border: 1px solid #e5e7eb;
 }
 
-/* نوار پیام داخل صفحه (برای خرید/توضیحات) */
 .message-bar {
     min-height: 0;
     font-size: 13px;
@@ -116,7 +112,6 @@ button, .btn{
     background-color: currentColor;
 }
 
-/* کنترل‌های اسلایدر */
 .slider-controls {
     display: flex;
     justify-content: flex-end;
@@ -148,7 +143,6 @@ button, .btn{
     border-color: #9ca3af;
 }
 
-/* گرید محصولات (هر اسلاید ۶ محصول) */
 .products-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));

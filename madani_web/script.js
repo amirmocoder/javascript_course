@@ -1,52 +1,20 @@
-/****************************************************
- *  پروژه: سیستم ساده فروشگاه داینامیک با JS خالص
- *  شامل: خواندن JSON، صفحه‌بندی، سبد خرید، تخفیف،
- *  ذخیره‌سازی رفتار کاربر با localStorage و کوکی‌ها،
- *  استفاده از Closure, Callbacks, Arrow Functions و…
- ****************************************************/
-
-
-/* --------------------------------------------------
-        🔷 متغیرهای عمومی مورد استفاده در کل پروژه
--------------------------------------------------- */
-
-// برای پیام‌های بالای صفحه
 var messageTimeout = null;
-
-// شماره صفحه فعلی (برای صفحه‌بندی)
 var currentPage = 1;
-
-// تعداد محصولاتی که در هر صفحه نمایش داده می‌شود
 var PRODUCTS_PER_PAGE = 6;
-
-// لیست کامل محصولات که از فایل products.json لود می‌شود
 var products = [];
-
-// آیا تخفیف شانسی فعال شده؟
 var discountEnabled = false;
-
-// آرایه‌ی سبد خرید
 var cartItems = [];
 
-
-
-/* --------------------------------------------------
-    🔷 تابع تبدیل اعداد به فرمت سه‌رقمی جداشده با کومّا
-    (Function Expression = تابع به‌صورت مقدار یک متغیر)
--------------------------------------------------- */
+// function to convert a int to a string in more readably formed
 var formatNumber = function (num) {
-    // تبدیل ورودی به رشته
     var str = String(num);
     var result = "";
     var count = 0;
     var i;
 
-    // از انتهای متن شروع می‌کنیم (برای جداکردن 3 تایی)
     for (i = str.length - 1; i >= 0; i--) {
         result = str.charAt(i) + result;
         count++;
-
-        // هر 3 رقم یک کاما اضافه می‌کنیم (اگر رقم اول نباشد)
         if (count === 3 && i !== 0) {
             result = "," + result;
             count = 0;
@@ -55,11 +23,7 @@ var formatNumber = function (num) {
     return result;
 };
 
-
-
-/* --------------------------------------------------
-   🔷 کوتاه کردن متن توضیحات (Function Declaration)
--------------------------------------------------- */
+// function to summarize the description for better UI
 function truncateText(text, limit) {
     if (!text) {
         return "";
@@ -70,34 +34,19 @@ function truncateText(text, limit) {
     return text.substring(0, limit) + "...";
 }
 
-
-
-/* --------------------------------------------------
-                🔷 توابع مدیریت کوکی‌ها
--------------------------------------------------- */
-
-/* 
-تابع ذخیره کوکی:
-name = نام کوکی
-value = مقدار آن
-days = چند روز اعتبار داشته باشد
-*/
+// function to set a Cookie
 function setCookie(name, value, days) {
     var d = new Date();
-    // زمان انقضا را حساب می‌کنیم
-    d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
 
-    // تبدیل به فرمت صحیح کوکی
+    // calcs expiration time in ms unit
+    d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
     var expires = "expires=" + d.toUTCString();
 
-    // ذخیره نهایی
+    // save Cookie
     document.cookie = name + "=" + encodeURIComponent(value) + ";" + expires + ";path=/";
 }
 
-
-/*
-تابع خواندن کوکی از طریق نام آن
-*/
+// function to get a Cookie using name
 function getCookie(name) {
     var cname = name + "=";
     var decoded = document.cookie || "";
@@ -107,12 +56,12 @@ function getCookie(name) {
     for (i = 0; i < ca.length; i++) {
         var c = ca[i];
 
-        // حذف فاصله‌های اضافی اول رشته
+        // strips string from left
         while (c.charAt(0) === " ") {
             c = c.substring(1);
         }
-
-        // اگر کوکی با نام موردنظر شروع شده بود → مقدارش را برمی‌گردانیم
+        
+        //checks if Cookie starts with Cookie name
         if (c.indexOf(cname) === 0) {
             return decodeURIComponent(c.substring(cname.length, c.length));
         }
@@ -120,38 +69,25 @@ function getCookie(name) {
     return "";
 }
 
-
-/*
-🔹 ذخیره تمام صفحات دیده‌شده توسط کاربر در کوکی
-*/
+// function to store visited page in Cookie
 function logPageClickToCookie(page) {
     var raw = getCookie("pageClicks");
     var arr = [];
     var i;
 
-    // اگر کوکی قبلاً وجود داشت → آن را تبدیل به آرایه می‌کنیم
     if (raw) {
         arr = raw.split(",");
     }
 
-    // شماره صفحه جدید را اضافه می‌کنیم
     arr.push(String(page));
 
-    // ذخیره مجدد کوکی
     setCookie("pageClicks", arr.join(","), 7);
 
+    // prints a log in console to insure that Cookie is set
     console.log("Page clicks (saved in cookie):", arr.join(","));
 }
 
-
-
-/* --------------------------------------------------
-          🔷 مدیریت ذخیره‌سازی داده‌ها در localStorage
--------------------------------------------------- */
-
-/*
-ذخیره سبد خرید در localStorage
-*/
+// function to save cart into localStorage
 function saveCartToStorage() {
     try {
         localStorage.setItem("cartItems", JSON.stringify(cartItems));
@@ -160,10 +96,7 @@ function saveCartToStorage() {
     }
 }
 
-
-/*
-لود سبد خرید از localStorage
-*/
+// function to load cart from localStorage
 function loadCartFromStorage() {
     try {
         var raw = localStorage.getItem("cartItems");
@@ -186,10 +119,7 @@ function loadCartFromStorage() {
     }
 }
 
-
-/*
-ذخیره صفحات دیده‌شده در localStorage
-*/
+// function to store visited pages in localStorage
 function addVisitedPageToStorage(page) {
     var arr = [];
 
@@ -205,7 +135,6 @@ function addVisitedPageToStorage(page) {
         arr = [];
     }
 
-    // جلوگیری از تکراری بودن
     if (arr.indexOf(page) === -1) {
         arr.push(page);
     }
@@ -215,9 +144,7 @@ function addVisitedPageToStorage(page) {
 }
 
 
-/*
-ذخیره کلیک روی دکمه "توضیحات"
-*/
+// function to store clicked detail buttons in localStorage
 function addDetailClickToStorage(productName) {
     var arr = [];
 
@@ -239,28 +166,17 @@ function addDetailClickToStorage(productName) {
     console.log("Details clicked:", productName);
 }
 
-
-
-/* --------------------------------------------------
-    🔷 تابع callback: اجرای یک عملیات روی همه محصولات
--------------------------------------------------- */
-
+// callback function to operate for each product
 function forEachProduct(callback) {
-    // callback می‌تواند هر تابع دلخواهی باشد
+    // it possible to pass any function to callback parameter
     var i;
     for (i = 0; i < products.length; i++) {
-        callback(products[i], i); // استفاده از callback
+        callback(products[i], i);
     }
 }
 
-
-
-/* --------------------------------------------------
-    🔷 تخفیف ۲۰٪ شانسی روی محصولات (با callback)
--------------------------------------------------- */
-
+// function to apply discount to products with 20% probability
 function applyRandomDiscountsToProducts() {
-    // احتمال ۲۰ درصد
     if (Math.random() > 0.2) {
         discountEnabled = false;
         return;
@@ -268,14 +184,15 @@ function applyRandomDiscountsToProducts() {
 
     discountEnabled = true;
 
-    // نمایش نوار تخفیف بالا
+    // show the discount you won message on discountBar
     var db = document.getElementById("discountBar");
     if (db) {
         db.style.display = "flex";
-        db.innerHTML = "تبریک! به‌صورت شانسی تخفیف ۱ تا ۳۰٪ دریافت کرده‌اید.";
-    }
+        db.innerHTML =
+            "تبریک! شما تخفیف بین ۱ تا ۳۰ درصدی روی محصولات دریافت کرده‌اید.";
+        }
 
-    // استفاده از callback در forEachProduct
+    // callback to iterate and apply discount to each product
     forEachProduct(function (p) {
         var basePrice = parseInt(p.price, 10);
         if (isNaN(basePrice)) {
@@ -283,11 +200,7 @@ function applyRandomDiscountsToProducts() {
         }
 
         var percent = Math.floor(Math.random() * 30) + 1;
-
-        // مبلغ تخفیف
         var discountAmount = Math.round(basePrice * percent / 100);
-
-        // قیمت نهایی بعد از تخفیف
         var newPrice = basePrice - discountAmount;
 
         p.discountPercent = percent;
@@ -295,181 +208,114 @@ function applyRandomDiscountsToProducts() {
     });
 }
 
-
-
-/* --------------------------------------------------
-                🔷 پیام داخلی بالای صفحه
--------------------------------------------------- */
-
+// function to show passed massage to user on top bar of page
 function showMessage(text, type) {
     var bar = document.getElementById("messageBar");
 
-    // ساخت کلاس CSS
+    // create and set proper class name related on type
     var cls = "message-bar message-bar--visible ";
     cls += type === "success" ? "message-bar--success" : "message-bar--info";
 
     bar.className = cls;
     bar.innerHTML = '<span class="message-dot"></span><span>' + text + '</span>';
 
-    // اگر پیام قبلی فعال است → پاک کنیم
+    // if already a message exists there clean it
     if (messageTimeout) {
         clearTimeout(messageTimeout);
     }
 
-    // بعد 3 ثانیه پیام مخفی شود
+    // clear message after few seconds
     messageTimeout = setTimeout(function () {
         bar.className = "message-bar";
     }, 3000);
 }
 
-
-
-/* --------------------------------------------------
-     🔷 نمایش توضیحات کامل محصول با alert (برای مبتدی!)
--------------------------------------------------- */
-
+// shows an alert contains full description of product
 function showDetails(productName, description) {
     addDetailClickToStorage(productName);
 
     alert("توضیحات " + productName + ":\n\n" + (description || "توضیحی موجود نیست"));
 }
 
-
-
-/* --------------------------------------------------
-                🔷 رندر کردن سبد خرید
--------------------------------------------------- */
-
-/**
- * ------------------------------------------------------------
- *  تابع renderCart
- *  این تابع مسئول آپدیت کامل بخش سبد خرید در صفحه است.
- *  هر بار که آیتمی اضافه یا حذف می‌شود یا تعداد تغییر می‌کند،
- *  این تابع سبد را از نو می‌سازد و جمع کل را محاسبه می‌کند.
- * ------------------------------------------------------------
- */
+// function to render (update, set and present) list of shopping
 function renderCart() {
 
-    // گرفتن کانتینر اصلی سبد خرید (جایی که آیتم‌ها قرار می‌گیرند)
     var container = document.getElementById("cartItems");
-
-    // گرفتن عنصر مربوط به نمایش جمع کل
     var totalEl = document.getElementById("cartTotal");
 
-    // ابتدا همه محتویات قبلی سبد را پاک می‌کنیم تا دوباره از نو بسازیم
+    // clear the container if any things is there
     container.innerHTML = "";
 
-    // متغیر total برای جمع کل قیمت‌ها
+    // to save sum of costs
     var total = 0;
 
 
-    /* ============================================================
-       🔹 مرحله اول: بررسی خالی بودن سبد خرید
-       اگر هیچ آیتمی وجود نداشته باشد، پیام "سبد خرید خالی است" نمایش می‌دهیم
-       و مقدار جمع کل را هم باید صفر کنیم.
-    ============================================================= */
+    // first scenario is the shopping card is empty
     if (!cartItems || cartItems.length === 0) {
 
-        // ساخت یک div برای پیام
         var empty = document.createElement("div");
         empty.className = "cart-empty";
         empty.innerHTML = "سبد خرید خالی است.";
-
         container.appendChild(empty);
 
-        // جمع کل باید صفر شود
         if (totalEl) {
             totalEl.textContent = "0";
         }
-
-        // از تابع خارج می‌شویم چون چیزی برای نمایش نیست
         return;
     }
 
-
-
-    /* ============================================================
-       🔹 مرحله دوم: حلقه روی آیتم‌های سبد خرید
-       هر آیتم شامل:
-       - نام محصول
-       - قیمت بدون تخفیف
-       - قیمت با تخفیف
-       - درصد تخفیف
-       - تعداد
-       - مجموع هر آیتم (تعداد × قیمت تخفیف‌خورده)
-       و برای هرکدام یک ردیف HTML می‌سازیم.
-    ============================================================= */
-
+    // present items in the shopping list
     var i;
     for (i = 0; i < cartItems.length; i++) {
 
         var item = cartItems[i];
-
-        // حساب کردن مجموع قیمت این آیتم (تعداد × قیمت بعد از تخفیف)
         var lineTotal = item.discountPrice * item.quantity;
-
-        // اضافه کردن به مجموع کل سبد
         total += lineTotal;
-
-
-        /* ===============================
-           ساخت ردیف اصلی هر آیتم در سبد
-        ================================ */
+        
+        // create row for each item
         var row = document.createElement("div");
         row.className = "cart-item-row";
 
-
-        /* -----------------------------------------
-           ستون سمت چپ → اطلاعات محصول (نام + قیمت‌ها)
-        ----------------------------------------- */
         var main = document.createElement("div");
         main.className = "cart-item-main";
 
-        // نام محصول
+        // show the name of item
         var nameEl = document.createElement("div");
         nameEl.className = "cart-item-name";
         nameEl.innerHTML = item.name;
         main.appendChild(nameEl);
 
-        // اطلاعات قیمت‌ها
         var meta = document.createElement("div");
         meta.className = "cart-item-meta";
 
-        // قیمت اصلی
+        // show the main price of item
         var spanBase = document.createElement("span");
         spanBase.innerHTML = "قیمت اصلی: " + formatNumber(item.basePrice);
 
-        // قیمت بعد از تخفیف
+        // show the new price of item
         var spanDiscPrice = document.createElement("span");
         spanDiscPrice.innerHTML =
             "قیمت بعد از تخفیف: " + formatNumber(item.discountPrice);
 
-        // درصد تخفیف
+        // show the discount percent of item
         var spanPercent = document.createElement("span");
         spanPercent.innerHTML = "تخفیف: " + item.discountPercent + "٪";
 
-        // افزودن قطعات قیمت به meta
         meta.appendChild(spanBase);
         meta.appendChild(spanDiscPrice);
         meta.appendChild(spanPercent);
-
-        // افزودن meta به ستون main
         main.appendChild(meta);
 
 
-
-        /* -----------------------------------------
-           ستون سمت راست → تعداد، مجموع، دکمه حذف
-        ----------------------------------------- */
         var side = document.createElement("div");
         side.className = "cart-item-side";
 
-        // تعداد
+        // show the quantities of item
         var qtyEl = document.createElement("span");
         qtyEl.className = "cart-qty";
         qtyEl.innerHTML = "تعداد: " + item.quantity;
 
-        // مجموع قیمت این آیتم
+        // show the total cost of item
         var lineTotalEl = document.createElement("span");
         lineTotalEl.className = "cart-line-total";
         lineTotalEl.innerHTML =
@@ -478,18 +324,12 @@ function renderCart() {
         side.appendChild(qtyEl);
         side.appendChild(lineTotalEl);
 
-
-
-        /* ===============================
-           دکمه حذف هر آیتم (باClosure)
-           توجه: این Closure باعث می‌شه هر دکمه
-           درست محصول مربوط به خودش رو حذف کنه
-        ================================ */
+        // create item remove button
         var removeBtn = document.createElement("button");
         removeBtn.className = "cart-remove-btn";
         removeBtn.innerHTML = "حذف";
 
-        // closure → جلوگیری از مشکل حلقه‌ها
+        // closure method has been used to remove item correctly
         removeBtn.onclick = (function (name) {
             return function () {
                 removeFromCart(name);
@@ -497,67 +337,40 @@ function renderCart() {
         })(item.name);
 
         side.appendChild(removeBtn);
-
-
-
-        /* ===============================
-           اضافه کردن ستون‌ها به ردیف
-        ================================ */
         row.appendChild(main);
         row.appendChild(side);
 
-        // اضافه کردن ردیف به سبد خرید
         container.appendChild(row);
     }
 
-
-
-    /* ============================================================
-       🔹 مرحله سوم: به‌روزرسانی جمع کل در DOM
-       حالا که total کامل محاسبه شده → نمایش می‌دهیم.
-    ============================================================= */
     if (totalEl) {
         totalEl.textContent = formatNumber(total);
     }
 }
 
-
-/* --------------------------------------------------
-              🔷 حذف محصول از سبد خرید
--------------------------------------------------- */
-
+// function to remove an item from shopping list
 function removeFromCart(productName) {
     var i;
-
-    // حذف آیتم از آرایه سبد خرید
     for (i = 0; i < cartItems.length; i++) {
         if (cartItems[i].name === productName) {
             cartItems.splice(i, 1);
             break;
         }
     }
-
-    // ذخیره در localStorage
+    
+    // save changes in localStorage
     saveCartToStorage();
-
-    // ⚠ خواندن مجدد از localStorage برای Sync کامل
     loadCartFromStorage();
 
-    // ⚠ اجرای رندر جدید برای آپدیت DOM
     renderCart();
-
     showMessage('"' + productName + '" از سبد خرید حذف شد.', "info");
 }
 
-/* --------------------------------------------------
-                🔷 افزودن محصول به سبد خرید
--------------------------------------------------- */
-
+// function to add item to shopping card
 function addToCart(productName) {
     var product = null;
     var i;
 
-    // پیدا کردن محصول
     for (i = 0; i < products.length; i++) {
         if (products[i].name === productName) {
             product = products[i];
@@ -572,16 +385,16 @@ function addToCart(productName) {
 
     var basePrice = parseInt(product.price, 10) || 0;
 
-    // درصد تخفیف
+    // get the discount percent of product
     var discountPercent = product.discountPercent || 0;
 
-    // مبلغ تخفیف
+    // get the discount amount of product
     var discountAmount = Math.round(basePrice * discountPercent / 100);
 
-    // قیمت نهایی بعد از تخفیف
+    // get new price of product
     var discountPrice = basePrice - discountAmount;
 
-    // آیا قبلاً در سبد بوده؟
+    // checks if the product has already been on shopping card as an item
     var found = false;
 
     for (i = 0; i < cartItems.length; i++) {
@@ -591,8 +404,7 @@ function addToCart(productName) {
             break;
         }
     }
-
-    // اگر نبود → اضافه کنیم
+    // if does not
     if (!found) {
         cartItems.push({
             name: productName,
@@ -609,59 +421,49 @@ function addToCart(productName) {
 }
 
 
-
-/* --------------------------------------------------
-        🔷 Closureهای ساخت هندلر دکمه‌ها
--------------------------------------------------- */
-
+// function to handle show detail of each product correctly using closure method
 function makeDetailHandler(name, description) {
-    // این تابع یک Closure است:
-    // توابعی که به متغیرهای محیط خود دسترسی دائمی دارند
     return function () {
         showDetails(name, description);
     };
 }
 
+// function to handle add item (product) to shopping its works for each product correctly using closure method
 function makeAddToCartHandler(name) {
     return function () {
         addToCart(name);
     };
 }
 
-
-
-/* --------------------------------------------------
-         🔷 ساخت کارت محصول برای نمایش در صفحه
--------------------------------------------------- */
-
+// function to create and present the card of product in pages
 function createProductCard(product) {
     var card = document.createElement("article");
     card.className = "product-card";
 
-    // تصویر محصول
+    // prepare the image of product
     var img = document.createElement("img");
     img.className = "product-image";
     img.src = product.image;
     img.alt = product.name;
     card.appendChild(img);
 
-    // بخش اطلاعات
+    // prepare the information of product
     var body = document.createElement("div");
     body.className = "product-body";
 
-    // تاریخ به‌روزرسانی
+    // prepare the last updated date of product
     var meta = document.createElement("div");
     meta.className = "product-meta";
     meta.innerHTML = "به‌روزرسانی: " + (product.updatedAt || "");
     body.appendChild(meta);
 
-    // عنوان
+    // prepare the title or name of product
     var title = document.createElement("div");
     title.className = "product-title";
     title.innerHTML = product.name;
     body.appendChild(title);
 
-    // نمایش چندکاراکتر اول توضیحات
+    // prepare the summarized detail of product
     if (product.description) {
         var desc = document.createElement("div");
         desc.className = "product-desc";
@@ -669,7 +471,7 @@ function createProductCard(product) {
         body.appendChild(desc);
     }
 
-    // بخش قیمت‌ها
+    // prepare the price of product
     var priceRow = document.createElement("div");
     priceRow.className = "price-row";
 
@@ -679,7 +481,7 @@ function createProductCard(product) {
     var current = document.createElement("div");
     var discount = document.createElement("div");
 
-    // اگر تخفیف وجود دارد
+    // if discount has been enabled on page
     if (discountEnabled && product.discountPrice) {
         original.className = "price-old";
         original.innerHTML = "تومان " + formatNumber(basePrice);
@@ -707,21 +509,19 @@ function createProductCard(product) {
     priceRow.appendChild(discount);
     body.appendChild(priceRow);
 
-    // اضافه کردن body به کارت
     card.appendChild(body);
 
-    // فوتر و دکمه‌ها
     var footer = document.createElement("div");
     footer.className = "product-footer";
 
-    // دکمه توضیحات
+    // prepare the detail button of product
     var btnDetails = document.createElement("button");
     btnDetails.className = "btn btn-secondary";
 
     btnDetails.innerHTML = "<span class='btn-icon'>✔</span><span>توضیحات</span>";
     btnDetails.onclick = makeDetailHandler(product.name, product.description);
 
-    // دکمه خرید
+    // prepare the buy item button of product
     var btnBuy = document.createElement("button");
     btnBuy.className = "btn btn-primary";
     btnBuy.innerHTML = "<span class='btn-icon'>🛒</span><span>خرید</span>";
@@ -734,24 +534,15 @@ function createProductCard(product) {
     return card;
 }
 
-
-
-/* --------------------------------------------------
-              🔷 صفحه‌بندی (نمایش محصولات)
--------------------------------------------------- */
-
 function getTotalPages() {
     return Math.ceil(products.length / PRODUCTS_PER_PAGE);
 }
 
+// functions to handel paging of products
 function showPage(page) {
-    var totalPages = getTotalPages();
-
-    if (page < 1) page = totalPages;
-    if (page > totalPages) page = 1;
-
     currentPage = page;
 
+    // to set start and end index of loading products on related page
     var start = (currentPage - 1) * PRODUCTS_PER_PAGE;
     var end = start + PRODUCTS_PER_PAGE;
 
@@ -763,38 +554,46 @@ function showPage(page) {
         grid.appendChild(createProductCard(products[i]));
     }
 
-    // نمایش شماره صفحه
+    // show the new page number
     document.getElementById("pageIndicator").innerHTML = "صفحه " + currentPage;
 
-    // ثبت در localStorage
     addVisitedPageToStorage(currentPage);
-
-    // ذخیره در کوکی
     logPageClickToCookie(currentPage);
 }
 
+// function to go to the next page
 function nextPage() {
-    showPage(currentPage + 1);
+    var lastPagesIndex = getTotalPages();
+    var nextPageIndex = currentPage + 1
+    if (nextPageIndex > lastPagesIndex){
+        return
+    } else{
+        showPage(nextPageIndex);
+    }
 }
 
+// function to go to the pervious page
 function prevPage() {
-    showPage(currentPage - 1);
+    var prevPageIndex = currentPage - 1
+    if (prevPageIndex <= 0){
+        return
+    } else{
+        showPage(prevPageIndex);
+    }
 }
 
-
-
-/* --------------------------------------------------
-             🔷 لود کردن محصولات از JSON
--------------------------------------------------- */
-
+// function to load products from source json file
 function loadProducts() {
     var xhr = new XMLHttpRequest();
+
+    // send get request to source json file asyncly
     xhr.open("GET", "products.json", true);
 
+    // set an event on readystate value changing
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
 
-            // اگر درخواست موفق بود
+            // if request was successful
             if (xhr.status === 200) {
                 try {
                     var data = JSON.parse(xhr.responseText);
@@ -806,11 +605,11 @@ function loadProducts() {
                     console.error("خطا در خواندن JSON:", e);
                     products = [];
                 }
-
-                // تخفیف شانسی
+                
+                // call the random discount function
                 applyRandomDiscountsToProducts();
 
-                // نمایش صفحه اول
+                // show the first page of product at first load
                 showPage(1);
             }
         }
@@ -819,20 +618,12 @@ function loadProducts() {
     xhr.send();
 }
 
-
-
-/* --------------------------------------------------
-      🔷 رویداد اصلی DOMContentLoaded (Arrow Function)
--------------------------------------------------- */
-
-// استفاده از arrow function طبق خواسته شما
 document.addEventListener("DOMContentLoaded", () => {
 
-    // اتصال دکمه‌های صفحه‌بندی
     document.getElementById("nextSlide").onclick = nextPage;
     document.getElementById("prevSlide").onclick = prevPage;
 
-    // اتصال دکمه پرداخت
+    // handel pay button actions
     document.getElementById("cartPayBtn").onclick = function () {
         if (!cartItems.length) {
             showMessage("سبد خرید خالی است.", "info");
@@ -841,10 +632,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    // لود سبد خرید از localStorage
     loadCartFromStorage();
     renderCart();
-
-    // لود محصولات از فایل JSON
+    
     loadProducts();
 });
