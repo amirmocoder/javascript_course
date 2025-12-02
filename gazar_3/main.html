@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fa">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="style.css">
+        <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+        <title>Countdown</title>
+    </head>
+    <body onload="UpdateValues()">
+        <div class="container">
+            <h2>Countdown</h2>
+            <div class="time-box">
+                <div class="time">
+                    <span id="minholder">0</span>
+                    <span class="lable">Mins</span>
+                </div>
+                <div class="time">
+                    <span id="secholder">0</span> 
+                    <span class="lable">Secs</span>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button name="start" onclick="ClickOnStart()">Start</button>
+                <button disabled name="pause" onclick="ClickOnPause()">Pause</button>
+                <button disabled name="reset" onclick="ClickOnReset()">Reset</button>
+                <script src="scripts.js"></script>
+            </div>
+        </div>
+    </body>
+</html>
