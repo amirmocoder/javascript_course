@@ -82,20 +82,18 @@ var ClickOnReset = function(){
         clearInterval(Interval);
         Interval = null;
     }
-    Cookies.set("status", "reset");
     Mins = Number(Cookies.get("EpochMins"));
     Secs = Number(Cookies.get("EpochSecs"));
     UpdateValues();
-    document.getElementsByName("start")[0].disabled = false;
-    document.getElementsByName("pause")[0].disabled = true;
-    document.getElementsByName("reset")[0].disabled = true;
+    Countdown();
+    Cookies.set("status", "started");
+    document.getElementsByName("start")[0].disabled = true;
+    document.getElementsByName("pause")[0].disabled = false;
+    document.getElementsByName("reset")[0].disabled = false;
 }
 
 // use values stored in Cookie to handel countdown even when page reloaded
 switch(Cookies.get("status")){
-    case "reset":
-        ClickOnReset();
-        break;
     case "started":
         ClickOnStart();
         break;
